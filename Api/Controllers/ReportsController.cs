@@ -21,6 +21,15 @@ public class ReportsController : ControllerBase
         return _context.InternshipReports.Include(x=> x.Entries).ToList();
     }
     
+    [HttpGet]
+    [Route("/api/reports/{id:int}")]
+    public ActionResult<InternshipReport> GetReportById(int id)
+    {
+        var report = 
+            _context.InternshipReports.Include(x => x.Entries).Where(r => r.Id == id);
+        return Ok(report);
+    }
+    
     [HttpPost]
     [Route("/api/reports")]
     public ActionResult<List<InternshipReport>> UploadReport([FromBody] InternshipReport? report)
