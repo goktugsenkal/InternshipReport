@@ -1,3 +1,4 @@
+using Api.DTOs;
 using Core.Entities;
 using Infrastructure;
 using Microsoft.AspNetCore.Mvc;
@@ -32,9 +33,18 @@ public class ReportsController : ControllerBase
     
     [HttpPost]
     [Route("/api/reports")]
-    public ActionResult<List<InternshipReport>> UploadReport([FromBody] InternshipReport? report)
+    public ActionResult<List<InternshipReport>> CreateReport([FromBody] CreateReportDto reportForCreate)
     {
-        if (report is null) return BadRequest();
+        if (reportForCreate is null) return BadRequest();
+
+        var report = new InternshipReport 
+        {
+            Name = reportForCreate.Name,
+            Description = reportForCreate.Description,
+            StartDate = reportForCreate.StartDate,
+            EndDate = reportForCreate.EndDate,
+            RegularShift = reportForCreate.RegularShift
+        };
         
         _context.InternshipReports.Add(report);
         _context.SaveChanges();
