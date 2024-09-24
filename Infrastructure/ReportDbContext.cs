@@ -3,9 +3,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure;
 
-public class ReportContext : DbContext
+public class ReportDbContext : DbContext
 {
-    public ReportContext(DbContextOptions<ReportContext> options)
+    public ReportDbContext(DbContextOptions<ReportDbContext> options)
         : base(options)
     {
         

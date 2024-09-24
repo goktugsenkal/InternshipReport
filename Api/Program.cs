@@ -9,7 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddDbContext<ReportContext>(o =>
+builder.Services.AddDbContext<ReportDbContext>(o =>
     //
     // This didn't work with migrations and I had to enter the connection string
     // to here manually for migrations and database update.
