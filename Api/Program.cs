@@ -1,4 +1,5 @@
 using Infrastructure;
+using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -8,10 +9,13 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddDbContext<ReportDbContext>(o => 
-    o.UseNpgsql("Server=127.0.0.1;Port=5432;Database=internship_reports;User Id=postgres;Password=goktug12;")
+builder.Services.AddDbContext<ReportContext>(o =>
+    //
+    // This didn't work with migrations and I had to enter the connection string
+    // to here manually for migrations and database update.
+    //
+    o.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
     );
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
