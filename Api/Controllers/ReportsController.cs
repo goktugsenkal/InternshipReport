@@ -50,4 +50,26 @@ public class ReportsController : ControllerBase
         _context.SaveChanges();
         return Ok();
     }
+
+    [HttpPost]
+    [Route("/api/reports/{id:int}/entry")]
+    public ActionResult<ReportEntry> CreateReportEntry(int id, string content)
+    {
+        var report = _context.InternshipReports
+        .FirstOrDefault(r => r.Id == id);
+        
+        if (report is null)
+        {
+            return NotFound();
+        }
+
+        var newEntry = new ReportEntry {
+            Content = content,
+            InternshipReportId = id
+        };
+
+        report.Entries.Add(newEntry);
+        _context.SaveChanges();
+        return Ok();
+    }
 }
