@@ -1,10 +1,13 @@
+using Core.Contracts;
 using Infrastructure;
+using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
+builder.Services.AddScoped<IReportRepository, ReportRepository>();
+builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -15,6 +18,8 @@ builder.Services.AddDbContext<ReportDbContext>(o =>
     //
     o.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
     );
+
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
