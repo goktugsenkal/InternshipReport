@@ -1,41 +1,49 @@
 using Api.DTOs;
+using Core.Contracts;
 using Core.Entities;
-using Infrastructure;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace Api.Controllers;
 
+[Route("api/[controller]")]
+[ApiController]
 public class ReportsController : ControllerBase
 {
-    private readonly ReportDbContext _context;
-    
-    public ReportsController(ReportDbContext context)
+    private readonly IReportRepository _reportRepository;
+
+    public ReportsController(IReportRepository reportRepository)
     {
-        _context = context;
+        _reportRepository = reportRepository;
+    }
+
+    [HttpGet]
+    public async Task<ActionResult<List<InternshipReport>>> GetReports()
+    {
+        var books = await _reportRepository.GetAllInternshipReportsAsync();
+
+        return Ok(books);
     }
     
-    [HttpGet]
-    [Route("/api/reports")]
-    public ActionResult<List<InternshipReport>> GetReports()
+    [HttpGet("{id:int}")]
+    public async Task<ActionResult<InternshipReport>> GetReportById(int id)
     {
-        return _context.InternshipReports.ToList();
-    }
-    
-    [HttpGet]
-    [Route("/api/reports/{id:int}")]
-    public ActionResult<InternshipReport> GetReportById(int id)
-    {
-        var report = 
-            _context.InternshipReports.Include(x => x.Entries).Where(r => r.Id == id);
+        var report = await _reportRepository.GetOneInternshipReportByIdAsync(id);
+
+        if (report is null)
+        {
+            return NotFound();
+        }
+
         return Ok(report);
     }
     
     [HttpPost]
-    [Route("/api/reports")]
-    public ActionResult<List<InternshipReport>> CreateReport([FromBody] CreateReportDto reportForCreate)
+    public ActionResult<CreateReportDto> CreateReport([FromBody] CreateReportDto reportForCreate)
     {
-        if (reportForCreate is null) return BadRequest();
+        if (reportForCreate is null)
+        {
+            return BadRequest("Hatalı defter girişi.");
+        }
 
         var report = new InternshipReport 
         {
@@ -46,17 +54,32 @@ public class ReportsController : ControllerBase
             RegularShift = reportForCreate.RegularShift
         };
         
-        _context.InternshipReports.Add(report);
-        _context.SaveChanges();
+        _reportRepository.CreateOneInternshipReport(report);
+        _reportRepository.SaveChangesToReports();
         return Ok();
     }
 
-    [HttpPost]
-    [Route("/api/reports/{id:int}/entry")]
-    public ActionResult<ReportEntry> CreateReportEntry(int id, [FromBody] string content)
+    [HttpDelete("{id:int}")]
+    public async Task<ActionResult> DeleteReportById(int id)
     {
-        var report = _context.InternshipReports
-        .FirstOrDefault(r => r.Id == id);
+        var report = await _reportRepository.GetOneInternshipReportByIdAsync(id);
+
+        if (report is null)
+        {
+            return NotFound();
+        }
+
+        _reportRepository.DeleteOneInternshipReport(report);
+        _reportRepository.SaveChangesToReports();
+
+        return Ok();
+    }
+    /*
+    [HttpPost]
+    [Route("{id:int}/entry")]
+    public async Task<ActionResult<ReportEntry>> CreateReportEntry(int id, [FromBody] string content)
+    {
+        var report = await _reportRepository.GetOneInternshipReportByIdAsync(id);
         
         if (report is null)
         {
@@ -69,7 +92,8 @@ public class ReportsController : ControllerBase
         };
 
         report.Entries.Add(newEntry);
-        _context.SaveChanges();
+        _reportRepository.SaveChangesToReports();
         return Ok();
     }
+    */
 }
