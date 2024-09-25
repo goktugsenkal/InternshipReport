@@ -19,7 +19,7 @@ public class ReportsController : ControllerBase
     [Route("/api/reports")]
     public ActionResult<List<InternshipReport>> GetReports()
     {
-        return _context.InternshipReports.Include(x=> x.Entries).ToList();
+        return _context.InternshipReports.ToList();
     }
     
     [HttpGet]
@@ -53,7 +53,7 @@ public class ReportsController : ControllerBase
 
     [HttpPost]
     [Route("/api/reports/{id:int}/entry")]
-    public ActionResult<ReportEntry> CreateReportEntry(int id, string content)
+    public ActionResult<ReportEntry> CreateReportEntry(int id, [FromBody] string content)
     {
         var report = _context.InternshipReports
         .FirstOrDefault(r => r.Id == id);
