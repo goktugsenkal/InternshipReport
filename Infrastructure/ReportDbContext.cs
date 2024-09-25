@@ -14,6 +14,11 @@ public class ReportDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.UseIdentityColumns();
+        modelBuilder.Entity<ReportEntry>()
+            .HasOne(r => r.InternshipReport)
+            .WithMany(e => e.Entries)
+            .HasForeignKey(r => r.InternshipReportId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 
     public DbSet<InternshipReport> InternshipReports { get; set; }
